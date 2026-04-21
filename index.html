@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deep & Sri - Wedding Invitation</title>
+    <title>Pragati & Yash - Wedding Invitation</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -15,8 +15,12 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Montserrat', 'sans-serif'],
+                        serif: ['Cinzel', 'serif'],
+                    },
+                    colors: {
+                        peach: { 100: '#ffecd2', 200: '#ffbE98', 300: '#ffa384', 400: '#ff7e67' },
+                        royal: { 800: '#5c1a1b', 900: '#3d0c0d' }
                     }
                 }
             }
@@ -27,7 +31,7 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
-<body class="font-sans antialiased bg-[#fffaf8] selection:bg-amber-200 selection:text-rose-900">
+<body class="font-sans antialiased bg-[#fdfaf6] selection:bg-peach-300 selection:text-royal-900">
     
     <div id="root"></div>
 
@@ -36,25 +40,14 @@
 
         // --- CONFIGURATION ---
         const siteConfig = {
-            couple: { groom: "Deep", bride: "Sri" },
-            parents: { groom: "Mr. & Mrs. Sharma", bride: "Mr. & Mrs. Verma" },
-            date: { full: "2nd May 2026", monthYear: "May 2026" },
+            couple: { bride: "Pragati", groom: "Yash" },
+            parents: { bride: "Mr. & Mrs. Sharma", groom: "Mr. & Mrs. Verma" },
+            date: { full: "15th November 2026" },
             musicUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-            events: [
-                { title: "Mehendi", time: "1st May • 4:00 PM", icon: "🌿", venue: "The Royal Gardens" },
-                { title: "Haldi", time: "2nd May • 10:00 AM", icon: "🥣", venue: "Courtyard Pavilion" },
-                { title: "Shaadi", time: "2nd May • 6:00 PM", icon: "🔥", venue: "The Grand Palace" },
-                { title: "Reception", time: "3rd May • 7:30 PM", icon: "🥂", venue: "The Crystal Ballroom" }
-            ],
-            gallery: [
-                "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=600&q=80",
-                "https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=600&q=80",
-                "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=600&q=80",
-                "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80"
-            ]
+            whatsappNumber: "1234567890", // Replace with your actual WhatsApp number with country code (e.g., 919876543210)
         };
 
-        // --- ANIMATION HOOKS ---
+        // --- ANIMATION HOOKS & UTILS ---
         const useIntersectionObserver = (options) => {
             const [isIntersecting, setIsIntersecting] = useState(false);
             const ref = useRef(null);
@@ -74,29 +67,32 @@
         const FadeIn = ({ children, delay = 0, className = "" }) => {
             const [ref, isVisible] = useIntersectionObserver({ threshold: 0.1 });
             return (
-                <div
-                    ref={ref}
-                    style={{ transitionDelay: `${delay}ms` }}
+                <div ref={ref} style={{ transitionDelay: `${delay}ms` }}
                     className={`transition-all duration-1000 ease-out transform ${
                         isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-12 scale-95'
-                    } ${className}`}
-                >
+                    } ${className}`}>
                     {children}
                 </div>
             );
         };
 
-        // --- COMPONENTS ---
-        const FloatingPetals = () => {
+        // --- GLOBAL EFFECTS (Petals & Birds) ---
+        const EnvironmentEffects = () => {
             useEffect(() => {
                 const style = document.createElement('style');
                 style.innerHTML = `
                 @keyframes fall {
                     0% { transform: translateY(-10vh) rotate(0deg) scale(0.5); opacity: 0; }
-                    20% { opacity: 0.8; }
+                    20% { opacity: 0.6; }
                     100% { transform: translateY(110vh) rotate(360deg) scale(1.2); opacity: 0; }
                 }
-                .petal { position: fixed; top: -10%; z-index: 50; pointer-events: none; animation: fall linear infinite; }
+                @keyframes fly {
+                    0% { transform: translate(-10vw, 30vh) scale(0.5); opacity: 0; }
+                    10% { opacity: 0.4; }
+                    100% { transform: translate(110vw, -10vh) scale(1.5); opacity: 0; }
+                }
+                .petal { position: fixed; top: -10%; z-index: 40; pointer-events: none; animation: fall linear infinite; }
+                .bird { position: absolute; z-index: 20; pointer-events: none; animation: fly linear infinite; opacity: 0.4; fill: #5c1a1b; }
                 `;
                 document.head.appendChild(style);
                 return () => document.head.removeChild(style);
@@ -104,17 +100,32 @@
 
             const petals = Array.from({ length: 15 }).map((_, i) => ({
                 left: `${Math.random() * 100}vw`,
-                animationDuration: `${Math.random() * 5 + 5}s`,
+                animationDuration: `${Math.random() * 6 + 6}s`,
                 animationDelay: `${Math.random() * 5}s`,
-                backgroundColor: Math.random() > 0.5 ? '#f43f5e' : '#fda4af',
+                backgroundColor: Math.random() > 0.5 ? '#ff7e67' : '#ffa384',
+            }));
+
+            const birds = Array.from({ length: 5 }).map((_, i) => ({
+                animationDuration: `${Math.random() * 15 + 15}s`,
+                animationDelay: `${Math.random() * 10}s`,
+                top: `${Math.random() * 40}vh`
             }));
 
             return (
-                <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
-                {petals.map((style, i) => (
-                    <div key={i} className="petal w-3 h-4 rounded-full opacity-60 mix-blend-multiply blur-[1px]" style={style} />
-                ))}
-                </div>
+                <>
+                    <div className="fixed inset-0 pointer-events-none z-40 overflow-hidden">
+                        {petals.map((style, i) => (
+                            <div key={`petal-${i}`} className="petal w-3 h-4 rounded-full mix-blend-multiply blur-[1px]" style={style} />
+                        ))}
+                    </div>
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden h-screen z-20">
+                        {birds.map((style, i) => (
+                            <svg key={`bird-${i}`} viewBox="0 0 24 24" className="bird w-6 h-6 md:w-10 md:h-10" style={style}>
+                                <path d="M2 12C2 12 5 10 7 10C9 10 12 12 12 12C12 12 15 10 17 10C19 10 22 12 22 12C22 12 19 8 17 8C15 8 12 10 12 10C12 10 9 8 7 8C5 8 2 12 2 12Z" />
+                            </svg>
+                        ))}
+                    </div>
+                </>
             );
         };
 
@@ -130,154 +141,211 @@
 
             return (
                 <div className="fixed bottom-6 right-6 z-50">
-                <audio ref={audioRef} src={siteConfig.musicUrl} loop />
-                <button 
-                    onClick={togglePlay}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${
-                    isPlaying ? 'bg-rose-800 text-white animate-pulse' : 'bg-white text-rose-800 border-2 border-rose-200'
-                    }`}
-                >
-                    {isPlaying ? '🎵' : '🔇'}
-                </button>
+                    <audio ref={audioRef} src={siteConfig.musicUrl} loop />
+                    <button 
+                        onClick={togglePlay}
+                        className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${
+                            isPlaying ? 'bg-royal-900 text-peach-200 animate-pulse' : 'bg-[#1a1a1a] text-peach-200 border border-royal-800/50'
+                        }`}
+                    >
+                        {isPlaying ? (
+                            <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        ) : (
+                            <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        )}
+                    </button>
                 </div>
             );
         };
 
-        const Hero = () => (
-            <section className="relative min-h-[100dvh] w-full flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-[#fdf6f5] to-[#f9ece6]">
-                <div 
-                    className="absolute bottom-0 w-full h-[60vh] bg-bottom bg-contain bg-no-repeat opacity-40 mix-blend-multiply"
-                    style={{ backgroundImage: "url('https://cdn.pixabay.com/photo/2019/04/17/12/12/taj-mahal-4134177_1280.png')" }} 
-                />
-                <div className="relative z-10 text-center px-4 mt-[-10vh]">
-                    <FadeIn>
-                        <div className="w-16 h-16 mx-auto mb-6 opacity-80">
-                            <svg viewBox="0 0 100 100" className="fill-amber-600 animate-[spin_20s_linear_infinite]">
-                                <path d="M50 0 L55 45 L100 50 L55 55 L50 100 L45 55 L0 50 L45 45 Z" />
-                            </svg>
-                        </div>
-                    </FadeIn>
-                    <FadeIn delay={200}>
-                        <h1 className="text-6xl md:text-8xl text-rose-900 font-serif mb-4 drop-shadow-sm">
-                            {siteConfig.couple.groom} <br/> <span className="text-amber-500 text-5xl md:text-7xl font-light">&</span> <br/> {siteConfig.couple.bride}
-                        </h1>
-                    </FadeIn>
-                </div>
-                <div className="absolute bottom-12 flex flex-col items-center animate-bounce opacity-60">
-                    <span className="text-xs tracking-[0.2em] uppercase text-rose-800 mb-2">Scroll</span>
-                    <div className="w-px h-12 bg-rose-800" />
-                </div>
-            </section>
-        );
+        // --- SECTIONS ---
 
-        const Blessings = () => (
-            <section className="py-24 px-6 bg-[#f9ece6] text-center">
+        const Hero = () => {
+            const [scrollY, setScrollY] = useState(0);
+            
+            useEffect(() => {
+                const handleScroll = () => setScrollY(window.scrollY);
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            return (
+                <section className="relative min-h-[100dvh] w-full flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-peach-300 via-peach-200 to-[#fdfaf6]">
+                    
+                    {/* Glowing Moon with Parallax */}
+                    <div 
+                        className="absolute top-[15%] left-[50%] -translate-x-1/2 md:left-[60%] w-40 h-40 md:w-64 md:h-64 rounded-full bg-[#fff4e6] opacity-90 mix-blend-screen"
+                        style={{ 
+                            boxShadow: '0 0 80px 20px rgba(255, 236, 209, 0.8), inset 0 0 40px rgba(255, 200, 150, 0.5)',
+                            transform: `translate(-50%, ${scrollY * 0.4}px)` // Parallax effect
+                        }}
+                    />
+
+                    {/* Content */}
+                    <div className="relative z-30 text-center px-4 mt-[-10vh]">
+                        <FadeIn>
+                            <p className="text-royal-800 tracking-[0.3em] uppercase text-xs md:text-sm mb-6 font-semibold opacity-80">
+                                The Wedding Celebration of
+                            </p>
+                        </FadeIn>
+                        <FadeIn delay={200}>
+                            <h1 className="text-6xl md:text-8xl text-royal-900 font-serif mb-2 drop-shadow-md">
+                                {siteConfig.couple.bride}
+                            </h1>
+                            <span className="block text-peach-400 text-5xl md:text-7xl font-serif italic my-2 drop-shadow-sm">&</span>
+                            <h1 className="text-6xl md:text-8xl text-royal-900 font-serif drop-shadow-md">
+                                {siteConfig.couple.groom}
+                            </h1>
+                        </FadeIn>
+                    </div>
+
+                    {/* Rajasthani Palace SVG Base */}
+                    <div className="absolute bottom-0 w-full z-20">
+                        <svg viewBox="0 0 1200 200" preserveAspectRatio="none" className="w-full h-32 md:h-64 fill-royal-900/10 stroke-royal-900/20">
+                            {/* Base structures and domes representing a generic palace skyline */}
+                            <path d="M0,200 L1200,200 L1200,150 L1150,150 L1150,100 C1150,70 1100,70 1100,100 L1100,150 L1000,150 L1000,60 C1000,20 900,20 900,60 L900,150 L800,150 L800,80 C800,40 700,40 700,80 L700,150 L500,150 L500,80 C500,40 400,40 400,80 L400,150 L300,150 L300,60 C300,20 200,20 200,60 L200,150 L100,150 L100,100 C100,70 50,70 50,100 L50,150 L0,150 Z" />
+                            <path d="M450,200 L450,150 A50,50 0 0 1 550,150 L550,200 Z" className="fill-[#fdfaf6]" />
+                            <path d="M650,200 L650,150 A50,50 0 0 1 750,150 L750,200 Z" className="fill-[#fdfaf6]" />
+                        </svg>
+                    </div>
+                </section>
+            );
+        };
+
+        const Families = () => (
+            <section className="py-24 px-6 bg-[#fdfaf6] text-center relative z-30">
                 <FadeIn>
-                    <div className="text-4xl text-amber-600 mb-6">🪔</div>
-                    <p className="font-serif italic text-rose-800/80 text-lg mb-8 max-w-md mx-auto">
-                        With the blessings of the divine and the love of our families...
+                    <div className="w-16 h-16 mx-auto mb-8">
+                        {/* Ganesha / Auspicious Icon Placeholder (Om/Swastik motif style) */}
+                        <svg viewBox="0 0 100 100" className="fill-peach-400">
+                            <path d="M50 10 C 20 10, 10 40, 50 90 C 90 40, 80 10, 50 10 Z" />
+                            <circle cx="50" cy="40" r="15" className="fill-royal-900" />
+                        </svg>
+                    </div>
+                    <p className="font-serif italic text-royal-800 text-lg md:text-xl mb-12 max-w-xl mx-auto leading-relaxed">
+                        Together with their families, we invite you to be a part of their beautiful journey...
                     </p>
-                    <div className="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-24 text-rose-950 font-medium tracking-wide">
+                    <div className="flex flex-col md:flex-row justify-center items-center gap-12 md:gap-32 text-royal-900 font-serif">
                         <div>
-                            <p className="text-sm uppercase tracking-widest text-rose-700/60 mb-1">Son of</p>
-                            <p>{siteConfig.parents.groom}</p>
+                            <p className="text-xs uppercase tracking-[0.2em] text-peach-400 mb-2 font-sans">Daughter of</p>
+                            <p className="text-xl">{siteConfig.parents.bride}</p>
                         </div>
-                        <div className="hidden md:block w-px h-12 bg-rose-300" />
+                        <div className="hidden md:block w-px h-16 bg-peach-300" />
                         <div>
-                            <p className="text-sm uppercase tracking-widest text-rose-700/60 mb-1">Daughter of</p>
-                            <p>{siteConfig.parents.bride}</p>
+                            <p className="text-xs uppercase tracking-[0.2em] text-peach-400 mb-2 font-sans">Son of</p>
+                            <p className="text-xl">{siteConfig.parents.groom}</p>
                         </div>
                     </div>
-                    <p className="mt-12 text-rose-800 text-xl font-serif">
-                        Invite you to celebrate their union.
-                    </p>
                 </FadeIn>
             </section>
         );
 
-        const Events = () => (
-            <section className="py-24 px-6 bg-[#fffaf8]">
-                <FadeIn>
-                    <h2 className="text-4xl md:text-5xl font-serif text-center mb-16 text-rose-900">Our Events</h2>
-                </FadeIn>
-                <div className="max-w-xl mx-auto relative">
-                    <div className="absolute left-1/2 top-0 bottom-0 w-px bg-amber-200 -translate-x-1/2" />
-                    {siteConfig.events.map((event, idx) => (
-                        <FadeIn key={idx} delay={idx * 150} className="relative mb-16 last:mb-0">
-                            <div className="flex flex-col items-center bg-white/50 backdrop-blur-sm p-6 rounded-3xl border border-rose-100 shadow-xl shadow-rose-900/5 relative z-10">
-                                <span className="text-4xl mb-4 p-4 bg-rose-50 rounded-full border border-rose-100">{event.icon}</span>
-                                <h3 className="text-2xl font-serif text-rose-900 mb-2">{event.title}</h3>
-                                <p className="text-amber-700 font-medium tracking-wide uppercase text-sm mb-1">{event.time}</p>
-                                <p className="text-rose-900/60 text-sm">{event.venue}</p>
-                            </div>
-                        </FadeIn>
-                    ))}
-                </div>
-            </section>
-        );
+        const Events = () => {
+            const eventsList = [
+                { title: "Mehendi & Sangeet", time: "14th Nov • 5:00 PM", icon: "🌿", venue: "The Royal Courtyard" }, // Mehendi hand motif
+                { title: "Haldi & Chooda", time: "15th Nov • 10:00 AM", icon: "✨", venue: "Poolside Pavilion" }, // Chandelier/Sparkle motif
+                { title: "The Wedding", time: "15th Nov • 6:30 PM", icon: "💍", venue: "The Grand Palace" } // Rings motif
+            ];
 
-        const MeetTheCouple = () => (
-            <section className="py-24 px-6 bg-[#f9ece6]">
-                <FadeIn>
-                    <h2 className="text-4xl md:text-5xl font-serif text-center mb-16 text-rose-900">Meet the Couple</h2>
-                </FadeIn>
-                <div className="flex flex-col md:flex-row justify-center gap-12 max-w-5xl mx-auto">
-                    <FadeIn delay={100} className="flex-1 flex flex-col items-center">
-                        <div className="w-64 h-80 md:w-80 md:h-[400px] p-2 bg-white rounded-t-full shadow-2xl mb-6 border border-rose-100">
-                            <img src="https://images.unsplash.com/photo-1558221689-0158dc115a33?auto=format&fit=crop&w=600&q=80" alt="Groom" className="w-full h-full object-cover rounded-t-full" />
-                        </div>
-                        <h3 className="text-3xl font-serif text-rose-900">{siteConfig.couple.groom}</h3>
-                    </FadeIn>
-                    <FadeIn delay={300} className="flex-1 flex flex-col items-center">
-                        <div className="w-64 h-80 md:w-80 md:h-[400px] p-2 bg-white rounded-t-full shadow-2xl mb-6 border border-rose-100">
-                            <img src="https://images.unsplash.com/photo-1610992383561-26ec05586617?auto=format&fit=crop&w=600&q=80" alt="Bride" className="w-full h-full object-cover rounded-t-full" />
-                        </div>
-                        <h3 className="text-3xl font-serif text-rose-900">{siteConfig.couple.bride}</h3>
-                    </FadeIn>
-                </div>
-            </section>
-        );
-
-        const Gallery = () => (
-            <section className="py-24 px-4 bg-[#fffaf8]">
-                <FadeIn>
-                    <h2 className="text-4xl md:text-5xl font-serif text-center mb-16 text-rose-900">Our Gallery</h2>
-                </FadeIn>
-                <div className="max-w-5xl mx-auto grid grid-cols-2 gap-4 md:gap-8">
-                    {siteConfig.gallery.map((img, idx) => (
-                        <FadeIn key={idx} delay={idx * 100} className={idx % 3 === 0 ? "col-span-2 md:col-span-1" : "col-span-1"}>
-                            <div className="overflow-hidden rounded-2xl md:rounded-[40px] shadow-lg h-48 md:h-80 group">
-                                <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-1000" />
-                            </div>
-                        </FadeIn>
-                    ))}
-                </div>
-            </section>
-        );
-
-        const RSVP = () => (
-            <section className="py-24 px-6 bg-rose-900 text-[#fdf6f5]">
-                <div className="max-w-2xl mx-auto text-center">
+            return (
+                <section className="py-24 px-6 bg-peach-100/30">
                     <FadeIn>
-                        <h2 className="text-4xl md:text-5xl font-serif mb-6 text-amber-400">Will you join us?</h2>
-                        <p className="text-rose-200 mb-10 font-light">Your presence will add joy to our new beginning.</p>
-                        <form className="space-y-4 text-left" onSubmit={(e) => e.preventDefault()}>
-                            <input type="text" placeholder="Enter your full name" className="w-full bg-rose-950/50 border border-rose-700 rounded-xl px-6 py-4 text-white placeholder-rose-400 focus:outline-none focus:border-amber-400 transition-colors" />
-                            <button className="w-full bg-amber-500 hover:bg-amber-400 text-rose-950 font-bold tracking-wide uppercase py-4 rounded-xl transition-colors">
-                                Yes, I'll be there
-                            </button>
-                        </form>
+                        <h2 className="text-4xl md:text-5xl font-serif text-center mb-16 text-royal-900">Celebrations</h2>
+                    </FadeIn>
+                    <div className="max-w-md mx-auto space-y-8">
+                        {eventsList.map((event, idx) => (
+                            <FadeIn key={idx} delay={idx * 150}>
+                                <div className="flex items-center gap-6 bg-white p-6 rounded-2xl shadow-xl shadow-peach-200/40 border border-peach-200">
+                                    <div className="flex-shrink-0 w-16 h-16 rounded-full bg-peach-100 flex items-center justify-center text-3xl border border-peach-300">
+                                        {event.icon}
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-serif text-royal-900 mb-1">{event.title}</h3>
+                                        <p className="text-peach-400 text-sm font-semibold tracking-wider uppercase mb-1">{event.time}</p>
+                                        <p className="text-royal-800/70 text-sm">{event.venue}</p>
+                                    </div>
+                                </div>
+                            </FadeIn>
+                        ))}
+                    </div>
+                </section>
+            );
+        };
+
+        const IllustratedCouple = () => (
+            <section className="py-24 px-6 bg-[#fdfaf6]">
+                <FadeIn>
+                    <h2 className="text-4xl md:text-5xl font-serif text-center mb-16 text-royal-900">The Couple</h2>
+                </FadeIn>
+                <div className="flex flex-col md:flex-row justify-center items-center gap-12 max-w-4xl mx-auto">
+                    {/* Bride Figure inside Arch */}
+                    <FadeIn delay={100} className="flex flex-col items-center">
+                        <div className="w-64 h-80 bg-peach-100 rounded-t-full shadow-lg border-2 border-peach-300 p-2 relative overflow-hidden group">
+                            {/* Rajasthani Arch Mask */}
+                            <div className="absolute inset-0 border-[8px] border-white rounded-t-full z-10 pointer-events-none" />
+                            <img 
+                                src="https://images.unsplash.com/photo-1595344464860-23a316279930?auto=format&fit=crop&w=600&q=80" 
+                                alt="Bride Illustration Placeholder" 
+                                className="w-full h-full object-cover rounded-t-full filter sepia-[0.3] group-hover:scale-105 transition-transform duration-700"
+                            />
+                        </div>
+                        <h3 className="text-3xl font-serif text-royal-900 mt-6">{siteConfig.couple.bride}</h3>
+                    </FadeIn>
+                    
+                    {/* Groom Figure inside Arch */}
+                    <FadeIn delay={300} className="flex flex-col items-center">
+                        <div className="w-64 h-80 bg-peach-100 rounded-t-full shadow-lg border-2 border-peach-300 p-2 relative overflow-hidden group">
+                            <div className="absolute inset-0 border-[8px] border-white rounded-t-full z-10 pointer-events-none" />
+                            <img 
+                                src="https://images.unsplash.com/photo-1558221689-0158dc115a33?auto=format&fit=crop&w=600&q=80" 
+                                alt="Groom Illustration Placeholder" 
+                                className="w-full h-full object-cover rounded-t-full filter sepia-[0.3] group-hover:scale-105 transition-transform duration-700"
+                            />
+                        </div>
+                        <h3 className="text-3xl font-serif text-royal-900 mt-6">{siteConfig.couple.groom}</h3>
                     </FadeIn>
                 </div>
             </section>
         );
+
+        const WhatsAppRSVP = () => {
+            const message = encodeURIComponent(`Hi ${siteConfig.couple.bride} and ${siteConfig.couple.groom}! We are so excited and will definitely be attending the wedding! 🎊`);
+            const waLink = `https://wa.me/${siteConfig.whatsappNumber}?text=${message}`;
+
+            return (
+                <section className="py-32 px-6 bg-royal-900 text-peach-100 text-center relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] mix-blend-overlay"></div>
+                    <div className="max-w-2xl mx-auto relative z-10">
+                        <FadeIn>
+                            <h2 className="text-4xl md:text-5xl font-serif mb-6 text-peach-300">Join our Celebration</h2>
+                            <p className="text-peach-200/80 mb-10 font-sans tracking-wide">
+                                Please let us know if you can make it. We can't wait to celebrate with you!
+                            </p>
+                            
+                            <a 
+                                href={waLink} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-3 bg-[#25D366] hover:bg-[#20b858] text-white font-bold px-8 py-4 rounded-full transition-all shadow-lg shadow-[#25D366]/30 transform hover:-translate-y-1"
+                            >
+                                <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                                    <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766 0 1.252.327 2.476.947 3.553l-.841 3.074 3.148-.826c1.037.568 2.215.867 3.421.867 3.18 0 5.768-2.585 5.768-5.767 0-3.181-2.588-5.767-5.768-5.767zm3.431 8.232c-.187.525-1.096.985-1.503 1.05-.415.066-.827.185-2.392-.464-1.89-1.04-3.1-3.003-3.195-3.13-.092-.125-.764-1.018-.764-1.942 0-.923.477-1.378.644-1.554.168-.175.364-.219.485-.219.123 0 .245.002.35.005.109.005.253-.042.396.304.144.347.491 1.2.535 1.288.043.088.072.19.015.305-.058.115-.087.188-.174.288-.086.1-.183.218-.26.3-.086.09-.176.188-.075.362.102.175.454.75 1.033 1.267.747.669 1.308.874 1.488.963.178.089.284.075.39-.045.105-.119.453-.526.577-.706.122-.18.243-.15.406-.089.163.061 1.033.488 1.21.577.178.09.296.136.34.214.043.078.043.453-.144.978z"/>
+                                    <path d="M12.031 2C6.49 2 2 6.49 2 12.031c0 1.77.464 3.5 1.344 5.022L2 22l5.084-1.33A9.97 9.97 0 0 0 12.031 22c5.541 0 10.031-4.49 10.031-10.031S17.572 2 12.031 2zm0 18.375c-1.503 0-2.977-.404-4.269-1.168l-.306-.182-3.17.828.843-3.091-.2-.317A8.344 8.344 0 0 1 3.656 12.03c0-4.618 3.757-8.375 8.375-8.375 4.619 0 8.376 3.757 8.376 8.375 0 4.618-3.757 8.375-8.375 8.375z"/>
+                                </svg>
+                                RSVP via WhatsApp
+                            </a>
+                        </FadeIn>
+                    </div>
+                </section>
+            );
+        };
 
         const Footer = () => (
-            <footer className="bg-rose-950 text-rose-300 py-12 text-center pb-24">
-                <h2 className="text-3xl font-serif text-amber-500 mb-2">
-                    {siteConfig.couple.groom} & {siteConfig.couple.bride}
+            <footer className="bg-[#1a0a0a] text-peach-400 py-12 text-center">
+                <h2 className="text-2xl font-serif mb-2">
+                    {siteConfig.couple.bride} & {siteConfig.couple.groom}
                 </h2>
-                <p className="tracking-[0.3em] text-xs uppercase opacity-60">
+                <p className="tracking-[0.3em] text-xs uppercase opacity-50 font-sans">
                     {siteConfig.date.full}
                 </p>
             </footer>
@@ -285,14 +353,13 @@
 
         const App = () => (
             <>
-                <FloatingPetals />
+                <EnvironmentEffects />
                 <MusicPlayer />
                 <Hero />
-                <Blessings />
+                <Families />
                 <Events />
-                <MeetTheCouple />
-                <Gallery />
-                <RSVP />
+                <IllustratedCouple />
+                <WhatsAppRSVP />
                 <Footer />
             </>
         );
