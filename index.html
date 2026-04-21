@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep & Sri - Wedding Invitation</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="font-sans antialiased bg-[#fffaf8] selection:bg-amber-200 selection:text-rose-900">
+    
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- CONFIGURATION ---
+        const siteConfig = {
+            couple: { groom: "Deep", bride: "Sri" },
+            parents: { groom: "Mr. & Mrs. Sharma", bride: "Mr. & Mrs. Verma" },
+            date: { full: "2nd May 2026", monthYear: "May 2026" },
+            musicUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+            events: [
+                { title: "Mehendi", time: "1st May • 4:00 PM", icon: "🌿", venue: "The Royal Gardens" },
+                { title: "Haldi", time: "2nd May • 10:00 AM", icon: "🥣", venue: "Courtyard Pavilion" },
+                { title: "Shaadi", time: "2nd May • 6:00 PM", icon: "🔥", venue: "The Grand Palace" },
+                { title: "Reception", time: "3rd May • 7:30 PM", icon: "🥂", venue: "The Crystal Ballroom" }
+            ],
+            gallery: [
+                "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=600&q=80",
+                "https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=600&q=80",
+                "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=600&q=80",
+                "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80"
+            ]
+        };
+
+        // --- ANIMATION HOOKS ---
+        const useIntersectionObserver = (options) => {
+            const [isIntersecting, setIsIntersecting] = useState(false);
+            const ref = useRef(null);
+            useEffect(() => {
+                const observer = new IntersectionObserver(([entry]) => {
+                    if (entry.isIntersecting) {
+                        setIsIntersecting(true);
+                        observer.unobserve(entry.target);
+                    }
+                }, options);
+                if (ref.current) observer.observe(ref.current);
+                return () => observer.disconnect();
+            }, [options]);
+            return [ref, isIntersecting];
+        };
+
+        const FadeIn = ({ children, delay = 0, className = "" }) => {
+            const [ref, isVisible] = useIntersectionObserver({ threshold: 0.1 });
+            return (
+                <div
+                    ref={ref}
+                    style={{ transitionDelay: `${delay}ms` }}
+                    className={`transition-all duration-1000 ease-out transform ${
+                        isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-12 scale-95'
+                    } ${className}`}
+                >
+                    {children}
+                </div>
+            );
+        };
+
+        // --- COMPONENTS ---
+        const FloatingPetals = () => {
+            useEffect(() => {
+                const style = document.createElement('style');
+                style.innerHTML = `
+                @keyframes fall {
+                    0% { transform: translateY(-10vh) rotate(0deg) scale(0.5); opacity: 0; }
+                    20% { opacity: 0.8; }
+                    100% { transform: translateY(110vh) rotate(360deg) scale(1.2); opacity: 0; }
+                }
+                .petal { position: fixed; top: -10%; z-index: 50; pointer-events: none; animation: fall linear infinite; }
+                `;
+                document.head.appendChild(style);
+                return () => document.head.removeChild(style);
+            }, []);
+
+            const petals = Array.from({ length: 15 }).map((_, i) => ({
+                left: `${Math.random() * 100}vw`,
+                animationDuration: `${Math.random() * 5 + 5}s`,
+                animationDelay: `${Math.random() * 5}s`,
+                backgroundColor: Math.random() > 0.5 ? '#f43f5e' : '#fda4af',
+            }));
+
+            return (
+                <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+                {petals.map((style, i) => (
+                    <div key={i} className="petal w-3 h-4 rounded-full opacity-60 mix-blend-multiply blur-[1px]" style={style} />
+                ))}
+                </div>
+            );
+        };
+
+        const MusicPlayer = () => {
+            const [isPlaying, setIsPlaying] = useState(false);
+            const audioRef = useRef(null);
+
+            const togglePlay = () => {
+                if (isPlaying) audioRef.current.pause();
+                else audioRef.current.play();
+                setIsPlaying(!isPlaying);
+            };
+
+            return (
+                <div className="fixed bottom-6 right-6 z-50">
+                <audio ref={audioRef} src={siteConfig.musicUrl} loop />
+                <button 
+                    onClick={togglePlay}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${
+                    isPlaying ? 'bg-rose-800 text-white animate-pulse' : 'bg-white text-rose-800 border-2 border-rose-200'
+                    }`}
+                >
+                    {isPlaying ? '🎵' : '🔇'}
+                </button>
+                </div>
+            );
+        };
+
+        const Hero = () => (
+            <section className="relative min-h-[100dvh] w-full flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-[#fdf6f5] to-[#f9ece6]">
+                <div 
+                    className="absolute bottom-0 w-full h-[60vh] bg-bottom bg-contain bg-no-repeat opacity-40 mix-blend-multiply"
+                    style={{ backgroundImage: "url('https://cdn.pixabay.com/photo/2019/04/17/12/12/taj-mahal-4134177_1280.png')" }} 
+                />
+                <div className="relative z-10 text-center px-4 mt-[-10vh]">
+                    <FadeIn>
+                        <div className="w-16 h-16 mx-auto mb-6 opacity-80">
+                            <svg viewBox="0 0 100 100" className="fill-amber-600 animate-[spin_20s_linear_infinite]">
+                                <path d="M50 0 L55 45 L100 50 L55 55 L50 100 L45 55 L0 50 L45 45 Z" />
+                            </svg>
+                        </div>
+                    </FadeIn>
+                    <FadeIn delay={200}>
+                        <h1 className="text-6xl md:text-8xl text-rose-900 font-serif mb-4 drop-shadow-sm">
+                            {siteConfig.couple.groom} <br/> <span className="text-amber-500 text-5xl md:text-7xl font-light">&</span> <br/> {siteConfig.couple.bride}
+                        </h1>
+                    </FadeIn>
+                </div>
+                <div className="absolute bottom-12 flex flex-col items-center animate-bounce opacity-60">
+                    <span className="text-xs tracking-[0.2em] uppercase text-rose-800 mb-2">Scroll</span>
+                    <div className="w-px h-12 bg-rose-800" />
+                </div>
+            </section>
+        );
+
+        const Blessings = () => (
+            <section className="py-24 px-6 bg-[#f9ece6] text-center">
+                <FadeIn>
+                    <div className="text-4xl text-amber-600 mb-6">🪔</div>
+                    <p className="font-serif italic text-rose-800/80 text-lg mb-8 max-w-md mx-auto">
+                        With the blessings of the divine and the love of our families...
+                    </p>
+                    <div className="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-24 text-rose-950 font-medium tracking-wide">
+                        <div>
+                            <p className="text-sm uppercase tracking-widest text-rose-700/60 mb-1">Son of</p>
+                            <p>{siteConfig.parents.groom}</p>
+                        </div>
+                        <div className="hidden md:block w-px h-12 bg-rose-300" />
+                        <div>
+                            <p className="text-sm uppercase tracking-widest text-rose-700/60 mb-1">Daughter of</p>
+                            <p>{siteConfig.parents.bride}</p>
+                        </div>
+                    </div>
+                    <p className="mt-12 text-rose-800 text-xl font-serif">
+                        Invite you to celebrate their union.
+                    </p>
+                </FadeIn>
+            </section>
+        );
+
+        const Events = () => (
+            <section className="py-24 px-6 bg-[#fffaf8]">
+                <FadeIn>
+                    <h2 className="text-4xl md:text-5xl font-serif text-center mb-16 text-rose-900">Our Events</h2>
+                </FadeIn>
+                <div className="max-w-xl mx-auto relative">
+                    <div className="absolute left-1/2 top-0 bottom-0 w-px bg-amber-200 -translate-x-1/2" />
+                    {siteConfig.events.map((event, idx) => (
+                        <FadeIn key={idx} delay={idx * 150} className="relative mb-16 last:mb-0">
+                            <div className="flex flex-col items-center bg-white/50 backdrop-blur-sm p-6 rounded-3xl border border-rose-100 shadow-xl shadow-rose-900/5 relative z-10">
+                                <span className="text-4xl mb-4 p-4 bg-rose-50 rounded-full border border-rose-100">{event.icon}</span>
+                                <h3 className="text-2xl font-serif text-rose-900 mb-2">{event.title}</h3>
+                                <p className="text-amber-700 font-medium tracking-wide uppercase text-sm mb-1">{event.time}</p>
+                                <p className="text-rose-900/60 text-sm">{event.venue}</p>
+                            </div>
+                        </FadeIn>
+                    ))}
+                </div>
+            </section>
+        );
+
+        const MeetTheCouple = () => (
+            <section className="py-24 px-6 bg-[#f9ece6]">
+                <FadeIn>
+                    <h2 className="text-4xl md:text-5xl font-serif text-center mb-16 text-rose-900">Meet the Couple</h2>
+                </FadeIn>
+                <div className="flex flex-col md:flex-row justify-center gap-12 max-w-5xl mx-auto">
+                    <FadeIn delay={100} className="flex-1 flex flex-col items-center">
+                        <div className="w-64 h-80 md:w-80 md:h-[400px] p-2 bg-white rounded-t-full shadow-2xl mb-6 border border-rose-100">
+                            <img src="https://images.unsplash.com/photo-1558221689-0158dc115a33?auto=format&fit=crop&w=600&q=80" alt="Groom" className="w-full h-full object-cover rounded-t-full" />
+                        </div>
+                        <h3 className="text-3xl font-serif text-rose-900">{siteConfig.couple.groom}</h3>
+                    </FadeIn>
+                    <FadeIn delay={300} className="flex-1 flex flex-col items-center">
+                        <div className="w-64 h-80 md:w-80 md:h-[400px] p-2 bg-white rounded-t-full shadow-2xl mb-6 border border-rose-100">
+                            <img src="https://images.unsplash.com/photo-1610992383561-26ec05586617?auto=format&fit=crop&w=600&q=80" alt="Bride" className="w-full h-full object-cover rounded-t-full" />
+                        </div>
+                        <h3 className="text-3xl font-serif text-rose-900">{siteConfig.couple.bride}</h3>
+                    </FadeIn>
+                </div>
+            </section>
+        );
+
+        const Gallery = () => (
+            <section className="py-24 px-4 bg-[#fffaf8]">
+                <FadeIn>
+                    <h2 className="text-4xl md:text-5xl font-serif text-center mb-16 text-rose-900">Our Gallery</h2>
+                </FadeIn>
+                <div className="max-w-5xl mx-auto grid grid-cols-2 gap-4 md:gap-8">
+                    {siteConfig.gallery.map((img, idx) => (
+                        <FadeIn key={idx} delay={idx * 100} className={idx % 3 === 0 ? "col-span-2 md:col-span-1" : "col-span-1"}>
+                            <div className="overflow-hidden rounded-2xl md:rounded-[40px] shadow-lg h-48 md:h-80 group">
+                                <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-1000" />
+                            </div>
+                        </FadeIn>
+                    ))}
+                </div>
+            </section>
+        );
+
+        const RSVP = () => (
+            <section className="py-24 px-6 bg-rose-900 text-[#fdf6f5]">
+                <div className="max-w-2xl mx-auto text-center">
+                    <FadeIn>
+                        <h2 className="text-4xl md:text-5xl font-serif mb-6 text-amber-400">Will you join us?</h2>
+                        <p className="text-rose-200 mb-10 font-light">Your presence will add joy to our new beginning.</p>
+                        <form className="space-y-4 text-left" onSubmit={(e) => e.preventDefault()}>
+                            <input type="text" placeholder="Enter your full name" className="w-full bg-rose-950/50 border border-rose-700 rounded-xl px-6 py-4 text-white placeholder-rose-400 focus:outline-none focus:border-amber-400 transition-colors" />
+                            <button className="w-full bg-amber-500 hover:bg-amber-400 text-rose-950 font-bold tracking-wide uppercase py-4 rounded-xl transition-colors">
+                                Yes, I'll be there
+                            </button>
+                        </form>
+                    </FadeIn>
+                </div>
+            </section>
+        );
+
+        const Footer = () => (
+            <footer className="bg-rose-950 text-rose-300 py-12 text-center pb-24">
+                <h2 className="text-3xl font-serif text-amber-500 mb-2">
+                    {siteConfig.couple.groom} & {siteConfig.couple.bride}
+                </h2>
+                <p className="tracking-[0.3em] text-xs uppercase opacity-60">
+                    {siteConfig.date.full}
+                </p>
+            </footer>
+        );
+
+        const App = () => (
+            <>
+                <FloatingPetals />
+                <MusicPlayer />
+                <Hero />
+                <Blessings />
+                <Events />
+                <MeetTheCouple />
+                <Gallery />
+                <RSVP />
+                <Footer />
+            </>
+        );
+
+        // --- RENDER APP ---
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
